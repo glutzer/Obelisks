@@ -1,0 +1,79 @@
+{
+  "code": "obelisk",
+  "class": "BlockObelisk",
+  "entityClass": "BlockEntityObelisk",
+  "creativeinventory":
+  {
+    "general":
+    [
+      "*"
+    ],
+    "obelisks":
+    [
+      "*"
+    ]
+  },
+  "sideopaque":
+  {
+    "all": false
+  },
+  "textures":
+  {
+    "all":
+    {
+      "base": "game:block/stone/rock/obsidian1"
+    },
+    "obsidian1":
+    {
+      "base": "game:block/stone/rock/obsidian1"
+    }
+  },
+  "selectionBoxes":
+  [
+    {
+      "x1": 0.2,
+      "y1": 0,
+      "z1": 0.2,
+      "x2": 0.8,
+      "y2": 3,
+      "z2": 0.8,
+      "_comment": "obelisk"
+    },
+    {
+      "x1": 0.25,
+      "y1": 1.25,
+      "z1": 0,
+      "x2": 0.75,
+      "y2": 1.75,
+      "z2": 0.1,
+      "_comment": "north"
+    },
+    {
+      "x1": 0.9,
+      "y1": 1.25,
+      "z1": 0.25,
+      "x2": 1,
+      "y2": 1.75,
+      "z2": 0.75,
+      "_comment": "east"
+    },
+    {
+      "x1": 0.25,
+      "y1": 1.25,
+      "z1": 0.9,
+      "x2": 0.75,
+      "y2": 1.75,
+      "z2": 1,
+      "_comment": "south"
+    },
+    {
+      "x1": 0,
+      "y1": 1.25,
+      "z1": 0.25,
+      "x2": 0.1,
+      "y2": 1.75,
+      "z2": 0.75,
+      "_comment": "west"
+    }
+  ]
+}

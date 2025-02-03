@@ -1,0 +1,14 @@
+{
+    "type": "code",
+    "modid": "obelisks",
+    "name": "Obelisks",
+    "authors": [
+        "chud"
+    ],
+    "description": "",
+    "version": "1.0.0",
+    "dependencies": {
+      "game": "",
+      "marelib": "1.0.0"
+    }
+}

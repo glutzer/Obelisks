@@ -1,0 +1,36 @@
+{
+  "code": "obeliskslave",
+  "class": "BlockObeliskSlave",
+  "variantgroups":
+  [
+    {
+      "code": "height",
+      "states":
+      [
+        "1",
+        "2"
+      ]
+    }
+  ],
+  "resistance": 6000,
+  "sideopaque":
+  {
+    "all": false
+  },
+  "shape":
+  {
+    "base": "game:block/basic/nothing"
+  },
+  "drawtype": "json",
+  "sidesolid":
+  {
+    "all": false
+  },
+  "handbook":
+  {
+    "exclude": true
+  },
+  "drops":
+  [
+  ]
+}

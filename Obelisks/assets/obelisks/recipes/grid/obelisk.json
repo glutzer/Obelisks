@@ -1,0 +1,20 @@
+{
+  "ingredientPattern": " G , G , G ",
+  "ingredients":
+  {
+    "G":
+    {
+      "type": "block",
+      "code": "game:rock-obsidian",
+      "quantity": 8
+    }
+  },
+  "width": 3,
+  "height": 3,
+  "output":
+  {
+    "type": "block",
+    "code": "obelisks:obelisk",
+    "quantity": 1
+  }
+}
