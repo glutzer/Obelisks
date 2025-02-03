@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Obelisks;
 
@@ -163,7 +162,8 @@ public class WidgetObeliskTranslocator : Widget
                 AddTeleportButton();
                 MainAPI.Capi.Gui.PlaySound("menubutton_down");
             }
-        };
+        }
+        ;
     }
 
     public override void OnRender(float dt, MareShader shader)

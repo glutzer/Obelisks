@@ -45,7 +45,7 @@ public class GlyphOfReflection : FieldGlyph, IPhysicsTickable
 
     private void Event_OnEntitySpawn(Entity entity)
     {
-        if (entity is not EntityProjectile && entity is not EntityThrownStone) return;
+        if (entity is not EntityProjectile and not EntityThrownStone) return;
 
         double dist = entity.Pos.DistanceTo(obelisk.Pos.ToVec3d());
 

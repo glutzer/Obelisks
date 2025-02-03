@@ -26,9 +26,10 @@ public class DistortionSystem : GameSystem, IRenderer
             distortionFbo.SetDimensions(width, height);
         };
         distortionFbo.AddAttachment(FramebufferAttachment.ColorAttachment0)
+            .AddAttachment(FramebufferAttachment.ColorAttachment1) // Out color.
             .AddAttachment(FramebufferAttachment.DepthAttachment);
 
-        // Write
+        distortionFbo.DrawBuffers(DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1);
 
         MareShaderRegistry.AddShader("obelisks:blit", "obelisks:blit", "blit");
         MareShaderRegistry.AddShader("obelisks:distortion", "obelisks:distortion", "distortion");
@@ -89,12 +90,25 @@ public class DistortionSystem : GameSystem, IRenderer
         distortion.Uniform("resolution", new Vector2(MainAPI.RenderWidth, MainAPI.RenderHeight));
         distortion.Uniform("useTexture", 0);
 
-        RenderTools.EnableDepthTest();
         RenderTools.DisableCulling();
+        RenderTools.SetAlphaBlending();
+        RenderTools.EnableBlending();
+        RenderTools.EnableDepthTest();
+        RenderTools.DisableDepthWrite();
+
+        distortion.Uniform("colorPass", 1);
 
         foreach (Action<float, MareShader> action in renderCallbacks.Values)
         {
-            action(dt, distortion);
+            action(dt * 0.5f, distortion);
+        }
+
+        RenderTools.EnableDepthWrite();
+        distortion.Uniform("colorPass", 0);
+
+        foreach (Action<float, MareShader> action in renderCallbacks.Values)
+        {
+            action(dt * 0.5f, distortion);
         }
 
         // Clean up.
@@ -104,12 +118,15 @@ public class DistortionSystem : GameSystem, IRenderer
         MareShader blit = MareShaderRegistry.Get("blit");
         blit.Use();
         blit.BindTexture(distortionFbo[FramebufferAttachment.ColorAttachment0].Handle, "tex2d", 0);
+        blit.BindTexture(distortionFbo[FramebufferAttachment.ColorAttachment1].Handle, "tex2dAdd", 1);
         GL.BindVertexArray(fullscreen.vaoId);
         GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
         GL.BindVertexArray(0);
 
         // Use old shader.
         current?.Use();
+
+        RenderTools.SetAlphaBlending();
     }
 
     public void Dispose()

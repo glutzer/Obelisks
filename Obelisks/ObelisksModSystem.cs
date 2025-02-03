@@ -1,7 +1,4 @@
-﻿using Cairo.Freetype;
-using MareLib;
-using OpenTK.Mathematics;
-using SkiaSharp;
+﻿using MareLib;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

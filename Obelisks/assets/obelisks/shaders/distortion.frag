@@ -17,7 +17,10 @@ uniform int useFresnel;
 uniform vec4 fresnelColor = vec4(1.0);
 uniform float fresnelStrength = 1.0;
 
-out vec4 fragColor;
+uniform int colorPass;
+
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec4 addColor;
 
 in vec3 position;
 in vec2 uvIn;
@@ -115,13 +118,19 @@ void main() {
 
   color /= float(16);
 
-  // Invisibility fresnel effect, not needed.
-  float f = fresnel(normalize(position), worldNormal, 2.0) * useFresnel;
-  float originalAverage = (color.r + color.b + color.g) / 3.0;
-  color += f * originalAverage * fresnelColor.rgb * fresnelColor.a;
-
   fragColor = vec4(color, 1.0);
 
-  fragColor.rgb += originalAverage * fresnelColor.rgb *
-                   edgeShimmer(gl_FragCoord.z, texture(depth, uv).r, 2.0) * 1.5;
+  if (colorPass == 1) {
+    // Invisibility fresnel effect, not needed.
+    float f = fresnel(normalize(position), worldNormal, 2.0) * useFresnel;
+    float originalAverage = (color.r + color.b + color.g) / 3.0;
+    addColor = f * fresnelColor;
+
+    vec4 edgeColor =
+        fresnelColor * edgeShimmer(gl_FragCoord.z, texture(depth, uv).r, 4.0);
+
+    edgeColor.a *= 0.25;
+
+    addColor += edgeColor;
+  }
 }
