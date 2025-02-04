@@ -50,9 +50,6 @@ void main() {
 
   uvNew = clamp(uvNew, 0, 1);
 
-  // uvNew.x = map(uvNew.x, 0, 1, atlasMap.x, atlasMap.z);
-  // uvNew.y = map(uvNew.y, 0, 1, atlasMap.y, atlasMap.w);
-
   vec4 colorA = colorOut * color * texture(tex2d, uvNew);
   colorA.a *= noiseA * 0.5 + 0.7;
 

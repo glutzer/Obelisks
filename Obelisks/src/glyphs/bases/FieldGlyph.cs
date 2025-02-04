@@ -54,7 +54,9 @@ public abstract class FieldGlyph : Inscription
         shader.Uniform("useFresnel", 1);
         shader.Uniform("fresnelColor", Color * Math.Clamp(obelisk.stats.Potentia / 100f, 0, 1));
 
+        RenderTools.SetDepthFunc(OpenTK.Graphics.OpenGL4.DepthFunction.Lequal);
         RenderTools.RenderMesh(icoSphere);
+        RenderTools.SetDepthFunc(OpenTK.Graphics.OpenGL4.DepthFunction.Less);
 
         shader.Uniform("useFresnel", 0);
         shader.Uniform("strength", 1f);

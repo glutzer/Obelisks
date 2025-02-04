@@ -35,13 +35,13 @@ public enum WaystoneRequestType
 [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
 public class WaystoneRequestPacket
 {
-    public GridPos gridPos;
+    public GridPos targetPos;
     public GridPos fromPos;
     public WaystoneRequestType requestType;
 
-    public WaystoneRequestPacket(GridPos gridPos, GridPos fromPos, WaystoneRequestType requestType)
+    public WaystoneRequestPacket(GridPos targetPos, GridPos fromPos, WaystoneRequestType requestType)
     {
-        this.gridPos = gridPos;
+        this.targetPos = targetPos;
         this.fromPos = fromPos;
         this.requestType = requestType;
     }
@@ -95,6 +95,15 @@ public class TranslocationSystem : NetworkedGameSystem
         channel.SetMessageHandler<WaystoneRequestPacket>(OnMessageReceived);
     }
 
+    public static GlyphOfTranslocation? TryGetGlyphAtPos(GridPos pos)
+    {
+        if (MainAPI.Sapi.World.BlockAccessor.GetBlockEntity(pos.AsBlockPos) is not BlockEntityObelisk be) return null;
+
+        if (be.currentGlyph is GlyphOfTranslocation tl) return tl;
+
+        return null;
+    }
+
     /// <summary>
     /// On client receiving packet with every waystone he has discovered.
     /// </summary>
@@ -111,25 +120,32 @@ public class TranslocationSystem : NetworkedGameSystem
     {
         if (packet.requestType == WaystoneRequestType.DoTranslocation)
         {
-            if (waystones.TryGetValue(packet.gridPos, out WaystoneData? data) && data.discoveredByPlayerUids.Contains(player.PlayerUID))
+            if (waystones.TryGetValue(packet.targetPos, out WaystoneData? data) && data.discoveredByPlayerUids.Contains(player.PlayerUID))
             {
-                if (MainAPI.Sapi.World.BlockAccessor.GetBlockEntity(packet.fromPos.AsBlockPos) is not BlockEntityObelisk ob) return;
-                if (ob.stats.Potentia < 100) return;
-                ob.stats.AddPotentia(-100);
-                ob.MarkDirty();
+                GlyphOfTranslocation? glyph = TryGetGlyphAtPos(packet.fromPos);
+                if (glyph == null) return;
 
-                GridPos chunkPos = packet.gridPos / 32;
+                if (glyph.PotentiaCost(packet.targetPos) > glyph.obelisk.stats.Potentia)
+                {
+                    MainAPI.Sapi.SendIngameError(player, $"{glyph.PotentiaCost(packet.targetPos)} potentia required to translocate here.", $"{glyph.PotentiaCost(packet.targetPos)} potentia required to translocate here.");
+                    return;
+                }
+
+                glyph.obelisk.stats.AddPotentia(-glyph.PotentiaCost(packet.targetPos));
+                glyph.obelisk.MarkDirty();
+
+                GridPos chunkPos = packet.targetPos / 32;
 
                 // Do translocation.
                 MainAPI.Sapi.WorldManager.LoadChunkColumnPriority(chunkPos.X, chunkPos.Z, new ChunkLoadOptions()
                 {
                     OnLoaded = () =>
                     {
-                        GridPos minPos = packet.gridPos - new GridPos(2, 2, 2);
-                        GridPos maxPos = packet.gridPos + new GridPos(2, 2, 2);
+                        GridPos minPos = packet.targetPos - new GridPos(2, 2, 2);
+                        GridPos maxPos = packet.targetPos + new GridPos(2, 2, 2);
 
                         bool found = false;
-                        GridPos newSpawn = packet.gridPos;
+                        GridPos newSpawn = packet.targetPos;
 
                         for (int x = minPos.X; x < maxPos.X; x++)
                         {

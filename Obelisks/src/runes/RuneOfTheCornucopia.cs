@@ -1,5 +1,6 @@
 ﻿using MareLib;
 using OpenTK.Mathematics;
+using System;
 using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -12,14 +13,33 @@ namespace Obelisks;
 /// <summary>
 /// Takes food from nearby 
 /// </summary>
-[Rune("game:gem-emerald-rough")]
+[Rune("game:ore-olivine")]
 public class RuneOfTheCornucopia : Inscription
 {
-    public override int MaxPower => 10;
+    public override int MaxPower => 50;
     public override Vector4 Color => new(0, 1, 0, 1);
     private long listenerId;
 
-    private static float PotentiaPerSatiety => 0.1f;
+    private static float PotentiaPerSatiety => 1;
+
+    private static readonly SimpleParticleProperties liquidParticles;
+    static RuneOfTheCornucopia()
+    {
+        liquidParticles = new SimpleParticleProperties()
+        {
+            MinVelocity = new Vec3f(0, 5, 0),
+            AddVelocity = new Vec3f(0, 5, 0),
+            addLifeLength = 3f,
+            LifeLength = 1f,
+            MinQuantity = 2,
+            AddQuantity = 2,
+            GravityEffect = 2f,
+            SelfPropelled = false,
+            MinSize = 0.35f,
+            MaxSize = 1f,
+            Color = ColorUtil.ToRgba(100, 0, 200, 0)
+        };
+    }
 
     public RuneOfTheCornucopia(BlockEntityObelisk obelisk, BlockPos pos, IWorldAccessor world) : base(obelisk, pos, world)
     {
@@ -29,7 +49,7 @@ public class RuneOfTheCornucopia : Inscription
     {
         if (isServer)
         {
-            listenerId = MainAPI.Sapi.Event.RegisterGameTickListener(CheckNearbyVessels, 5000);
+            listenerId = MainAPI.Sapi.Event.RegisterGameTickListener(CheckNearbyVessels, 30000);
         }
     }
 
@@ -45,6 +65,10 @@ public class RuneOfTheCornucopia : Inscription
         if (MainAPI.Sapi.World.AllPlayers.First() is not IServerPlayer player || player.Entity == null) return;
 
         if (MainAPI.Sapi.World.BlockAccessor.GetBlockEntity(new BlockPos(x, y, z)) is not BlockEntityGenericTypedContainer be) return;
+
+        Random rand = new();
+
+        int foodToConsume = (int)(rand.Next(5) * PowerPercent);
 
         foreach (ItemSlot slot in be.Inventory)
         {
@@ -63,7 +87,18 @@ public class RuneOfTheCornucopia : Inscription
                 slot.MarkDirty();
                 obelisk.stats.AddPotentia((int)(totalSatiety * PotentiaPerSatiety));
                 obelisk.MarkDirty();
-                return;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    liquidParticles.MinPos = new Vec3d(x, y + 1f, z);
+                    liquidParticles.AddPos = new Vec3d(0.8f, 0, 0.8f);
+
+                    MainAPI.Sapi.World.SpawnParticles(liquidParticles);
+                    liquidParticles.Color = ColorUtil.ToRgba(255, rand.Next(255), rand.Next(255), rand.Next(255));
+                }
+
+                foodToConsume--;
+                if (foodToConsume == 0) return;
             }
         }
     }

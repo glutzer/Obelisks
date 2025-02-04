@@ -13,7 +13,7 @@ namespace Obelisks;
 public class GlyphOfReflection : FieldGlyph, IPhysicsTickable
 {
     public override float FieldRange => PowerPercent * 10 * obelisk.stats.aoeMultiplier;
-    public override Vector4 Color => new(1, 1, 0, 1);
+    public override Vector4 Color => new(1, 1, 1, 1);
     private readonly Queue<Entity> trackedProjectiles = new();
 
     public GlyphOfReflection(BlockEntityObelisk obelisk, BlockPos pos, IWorldAccessor world) : base(obelisk, pos, world, "obelisks:objs/sphere.obj")
@@ -82,7 +82,8 @@ public class GlyphOfReflection : FieldGlyph, IPhysicsTickable
             {
                 proj.ServerPos.Motion.Set(normalOut.X * motionLength * 0.25, normalOut.Y * motionLength * 0.25, normalOut.Z * motionLength * 0.25);
                 MainAPI.Sapi.World.PlaySoundAt("obelisks:sounds/convert", position.X, position.Y, position.Z);
-                //proj.TeleportToDouble(position.X, position.Y, position.Z);
+
+                obelisk.stats.AddPotentia((int)(-100 * obelisk.stats.powerMultiplier));
             }
             else if (motionLength > 0.005)
             {

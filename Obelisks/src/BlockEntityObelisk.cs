@@ -24,8 +24,8 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
 {
     public MeshHandle? obeliskMesh;
     public MeshHandle? runeMesh;
-    public Texture runeTexture = null!;
-    public Texture obeliskTexture = null!;
+    public Texture rune1 = null!;
+    public Texture rune2 = null!;
     public TextureAtlasPosition? obeliskTexPos;
 
     public Inscription? currentGlyph;
@@ -39,8 +39,8 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
 
         if (api is ICoreClientAPI)
         {
-            runeTexture = ClientCache.GetOrCache("runeTexture", () => Texture.Create("obelisks:textures/runes/rune1.png"));
-            obeliskTexture = ClientCache.GetOrCache("obeliskTexture", () => Texture.Create("obelisks:textures/runes/swirl.png"));
+            rune1 = ClientCache.GetOrCache("runeTexture1", () => Texture.Create("obelisks:textures/runes/rune1.png"));
+            rune2 = ClientCache.GetOrCache("runeTexture2", () => Texture.Create("obelisks:textures/runes/rune2.png"));
             InitializeRenderer();
         }
     }
@@ -237,9 +237,10 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
         ShapeTextureSource textureSource = new(MainAPI.Capi, obeliskShape, "");
         MainAPI.Capi.Tesselator.TesselateShape("", obeliskShape, out MeshData meshData, textureSource);
 
-        obeliskTexPos = textureSource[obeliskShape.Textures.First().Value];
-
         MeshInfo<StandardVertex> standardMesh = new(6, 6);
+
+        Vector2 minUv = new(float.MaxValue);
+        Vector2 maxUv = new(float.MinValue);
 
         for (int i = 0; i < meshData.VerticesCount; i++)
         {
@@ -279,6 +280,15 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
                 Vector4.One);
 
             standardMesh.AddVertex(vertex);
+
+            float xUv = meshData.Uv[i * 2];
+            float yUv = meshData.Uv[(i * 2) + 1];
+
+            minUv.X = Math.Min(xUv, minUv.X);
+            minUv.Y = Math.Min(yUv, minUv.Y);
+
+            maxUv.X = Math.Max(xUv, maxUv.X);
+            maxUv.Y = Math.Max(yUv, maxUv.Y);
         }
 
         for (int i = 0; i < meshData.IndicesCount; i++)
@@ -287,6 +297,8 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
         }
 
         obeliskMesh = standardMesh.Upload();
+
+        obeliskTexPos = new() { x1 = minUv.X, y1 = minUv.Y, x2 = maxUv.X, y2 = maxUv.Y };
     }
 
     public override void OnBlockUnloaded()
@@ -327,7 +339,7 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
 
     public void OnRenderFrame(float dt, EnumRenderStage stage)
     {
-        if (obeliskMesh == null || runeMesh == null || runeTexture == null || obeliskTexture == null || obeliskTexPos == null) return;
+        if (obeliskMesh == null || runeMesh == null || rune1 == null || obeliskTexPos == null) return;
 
         IShaderProgram current = MainAPI.Capi.Render.CurrentActiveShader;
 
@@ -369,7 +381,7 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
 
             Matrix4 matObelisk = Matrix4.CreateTranslation(-0.5f, -0.3f, -0.5f) * Matrix4.CreateScale(1.1f, 1.1f, 1.1f) * Matrix4.CreateTranslation(0.5f, 0.3f, 0.5f) * mat;
 
-            shader.BindTexture(obeliskTexture, "tex2d");
+            shader.BindTexture(rune2, "tex2d");
             shader.Uniform("atlasMap", new Vector4(obeliskTexPos.x1, obeliskTexPos.y1, obeliskTexPos.x2, obeliskTexPos.y2));
 
             if (currentGlyph != null)
@@ -384,7 +396,7 @@ public class BlockEntityObelisk : BlockEntity, IRenderer
                 RenderTools.RenderMesh(obeliskMesh);
             }
 
-            shader.BindTexture(runeTexture, "tex2d");
+            shader.BindTexture(rune1, "tex2d");
             shader.Uniform("atlasMap", new Vector4(0, 0, 1, 1));
 
             for (int i = 0; i < 4; i++)

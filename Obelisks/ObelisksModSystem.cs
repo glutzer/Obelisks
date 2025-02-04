@@ -92,7 +92,7 @@ public class ObelisksSystem : NetworkedGameSystem
 
     public override void OnClose()
     {
-        ObeliskGui.ClearCache();
+        ObeliskGuiThemes.ClearCache();
     }
 }
 

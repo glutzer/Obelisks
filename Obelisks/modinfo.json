@@ -6,9 +6,9 @@
         "chud"
     ],
     "description": "",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "dependencies": {
       "game": "",
-      "marelib": "1.0.0"
+      "marelib": "1.1.0"
     }
 }

@@ -18,8 +18,8 @@ public class WidgetObeliskTranslocator : Widget
     private readonly List<WaystoneData> waystoneData;
     private Vector2d currentStonePos;
 
-    private Texture ObeliskTex { get; } = ObeliskGui.ButtonUp;
-    private Texture IconBg { get; } = ObeliskGui.IconBg;
+    private Texture ObeliskTex { get; } = ObeliskGuiThemes.Obelisk;
+    private Texture IconBg { get; } = ObeliskGuiThemes.IconBg;
 
     public WaystoneData? currentMousedWaystone;
     public WaystoneData? currentSelectedWaystone;
@@ -40,6 +40,7 @@ public class WidgetObeliskTranslocator : Widget
         normalFont = new TextObject("", FontRegistry.GetFont("friz"), 30, new Vector4(0, 1, 0.3f, 1));
         cipherFont = new TextObjectIndecipherable("", FontRegistry.GetFont("runic"), 30, Vector4.One, FontRegistry.GetFont("friz"), CipherType.FirstRandomized);
         accumulator.SetInterval(0.05f);
+        accumulator.Max(1f);
     }
 
     public void AddTeleportButton()
@@ -51,15 +52,10 @@ public class WidgetObeliskTranslocator : Widget
 
         if (new Vector2d(currentSelectedWaystone.position.X, currentSelectedWaystone.position.Z) == currentStonePos) return;
 
-        buttonBounds = Bounds.CreateFrom(bounds).Alignment(Align.LeftTop).Fixed(0, 0, 256, 64);
-        AddChild(new RockButton(gui, buttonBounds, () =>
+        buttonBounds = Bounds.CreateFrom(bounds).Alignment(Align.LeftTop).Fixed(0, 0, 320, 64);
+        AddChild(new ObeliskButton(gui, buttonBounds, () =>
         {
             ObeliskTeleportGui obGui = (ObeliskTeleportGui)gui;
-            if (obGui.obelisk.stats.Potentia < 100)
-            {
-                MainAPI.Capi.TriggerIngameError(this, "notenoughpotentia", "100 potentia required for ascension.");
-                return;
-            }
             MainAPI.GetGameSystem<TranslocationSystem>(EnumAppSide.Client).SendPacket(new WaystoneRequestPacket(currentSelectedWaystone.position, new GridPos(obGui.obelisk.Pos), WaystoneRequestType.DoTranslocation));
             gui.TryClose();
         }, "Ascend From Flesh", 30));
@@ -230,12 +226,6 @@ public class WidgetObeliskTranslocator : Widget
 
             RenderTools.RenderQuad(shader, pixelPos.X - 32, pixelPos.Y - 32, 64, 64);
         }
-
-        Vector2i currentPixelPos = GetPixelOfPosition(currentStonePos);
-        currentPixelPos = Vector2i.Clamp(currentPixelPos, new Vector2i(bounds.X, bounds.Y), new Vector2i(bounds.X + bounds.Width, bounds.Y + bounds.Height));
-        shader.Uniform("color", new Vector4(0.5f, 6, 0.5f, 1));
-        RenderTools.RenderQuad(shader, currentPixelPos.X - 32, currentPixelPos.Y - 32, 64, 64);
-        shader.Uniform("color", Vector4.One);
 
         if (currentMousedWaystone != null)
         {

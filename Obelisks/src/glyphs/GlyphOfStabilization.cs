@@ -14,7 +14,7 @@ public class GlyphOfStabilization : FieldGlyph, IPhysicsTickable
 {
     public override float FieldRange => PowerPercent * 10 * obelisk.stats.aoeMultiplier;
     private long longIntervalId;
-    public override Vector4 Color => new(0, 0.5f, 1, 1);
+    public override Vector4 Color => new(0, 0.3f, 1, 1);
     private readonly List<Entity> enemies = new();
     private readonly List<EntityPlayer> players = new();
 
@@ -58,6 +58,13 @@ public class GlyphOfStabilization : FieldGlyph, IPhysicsTickable
             return dist < FieldRange;
         });
 
+        // 5_000 seconds by default to drain.
+        if (MainAPI.Sapi.World.Rand.Next(10) == 1)
+        {
+            int potentiaDrain = (int)(10 * obelisk.stats.powerMultiplier);
+            obelisk.stats.AddPotentia(-potentiaDrain);
+        }
+
         foreach (Entity item in entities)
         {
             if (item is EntityPlayer player) players.Add(player);
@@ -69,7 +76,7 @@ public class GlyphOfStabilization : FieldGlyph, IPhysicsTickable
         {
             if (player.GetBehavior<EntityBehaviorTemporalStabilityAffected>() is EntityBehaviorTemporalStabilityAffected stabilityAffected)
             {
-                stabilityAffected.CallMethod("AddStability", 0.05f);
+                stabilityAffected.CallMethod("AddStability", 0.01f * obelisk.stats.powerMultiplier);
             }
         }
     }

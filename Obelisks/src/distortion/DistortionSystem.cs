@@ -33,7 +33,6 @@ public class DistortionSystem : GameSystem, IRenderer
 
         MareShaderRegistry.AddShader("obelisks:blit", "obelisks:blit", "blit");
         MareShaderRegistry.AddShader("obelisks:distortion", "obelisks:distortion", "distortion");
-        MareShaderRegistry.AddShader("obelisks:distortionanimated", "obelisks:distortion", "distortionanimated");
     }
 
     /// <summary>

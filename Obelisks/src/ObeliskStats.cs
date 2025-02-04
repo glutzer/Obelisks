@@ -8,7 +8,7 @@ namespace Obelisks;
 public class ObeliskStats
 {
     public int Potentia { get; set; } = 0;
-    public int maxPotentia = 1_000;
+    public int maxPotentia = 10_000;
     public float powerMultiplier = 1;
     public float aoeMultiplier = 1;
     public float potentiaCostMultiplier = 1;

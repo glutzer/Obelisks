@@ -4,7 +4,12 @@
   "GlyphOfTranslocation": "Glyph of Translocation",
   "GlyphOfStabilization": "Glyph of Stabilization",
   "GlyphOfStasis": "Glyph of Stasis",
+  "GlyphOfReflection": "Glyph of Reflection",
   "RuneOfSacrifice": "Rune of Sacrifice",
   "RuneOfTheCornucopia": "Rune of the Cornucopia",
+  "RuneOfExpansion": "Rune of Expansion",
+  "RuneOfInspiration": "Rune of Inspiration",
+  "RuneOfDelusion": "Rune of Delusion",
+  "RuneOfPower": "Rune of Power",
   "ingamediscovery-waystone": "Waystone Discovered"
 }

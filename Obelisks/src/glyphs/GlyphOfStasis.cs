@@ -30,7 +30,7 @@ public class GlyphOfStasis : FieldGlyph
 
         if (isServer)
         {
-            MainAPI.Sapi.Event.RegisterGameTickListener(SlowTick, 2000);
+            MainAPI.Sapi.Event.RegisterGameTickListener(SlowTick, 10000);
         }
     }
 
@@ -54,6 +54,13 @@ public class GlyphOfStasis : FieldGlyph
         foreach (EntityPlayer ePlayer in playerList)
         {
             ePlayer.Stats.Remove("hungerrate", "stasis");
+        }
+
+        // 10_000 seconds by default to drain.
+        if (MainAPI.Sapi.World.Rand.Next(10) == 1)
+        {
+            int potentiaDrain = (int)(10 * obelisk.stats.powerMultiplier);
+            obelisk.stats.AddPotentia(-potentiaDrain);
         }
 
         playerList.Clear();

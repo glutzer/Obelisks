@@ -19,7 +19,7 @@ public class RuneOfSacrifice : Inscription
         liquidParticles = new SimpleParticleProperties()
         {
             MinVelocity = new Vec3f(-6f, -6f, -6f),
-            AddVelocity = new Vec3f(12f, 12f,12f),
+            AddVelocity = new Vec3f(12f, 12f, 12f),
             addLifeLength = 4f,
             LifeLength = 0.5f,
             MinQuantity = 40,
@@ -46,15 +46,15 @@ public class RuneOfSacrifice : Inscription
 
     private void Event_OnEntityDeath(Entity entity, DamageSource? damageSource)
     {
-        if (damageSource != null && damageSource.Source != EnumDamageSource.Unknown && entity.Pos.DistanceTo(obelisk.Pos.ToVec3d()) < currentPower / 5)
+        if (damageSource != null && damageSource.Source != EnumDamageSource.Unknown && entity.Pos.DistanceTo(obelisk.Pos.ToVec3d()) < currentPower / 5 * obelisk.stats.aoeMultiplier)
         {
             if (isServer && !entity.Attributes.GetBool("sacrificed"))
             {
-                // Add 2x the entity's max HP to the obelisk.
+                // Add 20x the entity's max HP to the obelisk.
                 if (entity.WatchedAttributes.GetTreeAttribute("health") is TreeAttribute health)
                 {
                     float maxHealth = health.GetFloat("maxhealth");
-                    obelisk.stats.AddPotentia((int)maxHealth * 2);
+                    obelisk.stats.AddPotentia((int)maxHealth * 20);
                 }
 
                 obelisk.MarkDirty();
